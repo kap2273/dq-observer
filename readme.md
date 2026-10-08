@@ -87,6 +87,17 @@ All 3 injected faults were caught with no false alarms on clean days.
 - `inject_fault.py` is not idempotent: running it twice without reseeding damages data twice.
 - Results are printed, not stored.
 
+## Testing
+
+```bash
+pytest
+```
+
+| Test file | What it proves |
+|---|---|
+| `test_rules.py` | Clean data passes; each rule catches its own fault (duplicates, blank customers, negative amounts, invalid status) |
+| `test_profile.py` | Metrics match hand-calculated values on a small known table |
+
 ## Project files
 
 | File | Purpose |
