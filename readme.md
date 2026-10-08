@@ -69,7 +69,10 @@ On 30 synthetic daily batches with a score threshold of 0.03:
 | Sept 23 | Rules | BLOCK |
 | Other 27 days | n/a | PASS |
 
+
 All 3 injected faults were caught with no false alarms on clean days.
+
+![Quality report](docs/report.png)
 
 ## Design decisions
 

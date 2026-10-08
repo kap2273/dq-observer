@@ -3,6 +3,7 @@ from profile_batch import profile
 from anomaly import detect_anomalies
 from pathlib import Path
 import pandas as pd
+from report import build_report
 
 results = []
 files = sorted(Path("data/batches").glob("orders_*.csv"))
@@ -28,3 +29,5 @@ for i, row in table.iterrows():
 table["verdict"] = verdict
 
 print(table[["file","rule_failures","score","verdict"]])
+
+build_report(table)
