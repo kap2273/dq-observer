@@ -4,6 +4,7 @@ from anomaly import detect_anomalies
 from pathlib import Path
 import pandas as pd
 from report import build_report
+from db import save_results
 
 results = []
 files = sorted(Path("data/batches").glob("orders_*.csv"))
@@ -31,3 +32,4 @@ table["verdict"] = verdict
 print(table[["file","rule_failures","score","verdict"]])
 
 build_report(table)
+save_results(table)

@@ -113,6 +113,5 @@ pytest
 
 - Store results in PostgreSQL
 - HTML report of verdicts and score trends
-- Automated tests with pytest
 - Chronological evaluation for threshold tuning
 - Scheduling with Airflow in Docker
