@@ -41,13 +41,16 @@ Tested on Ubuntu 26.04 (WSL) with Python 3.14.
 ```bash
 git clone <this-repo-url>
 cd dq-observer
+cp .env.example .env          # then set your own password in .env
+docker compose up -d          # start PostgreSQL (table is created automatically)
+
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-python seed.py           # generate 30 days of clean synthetic orders
-python inject_fault.py   # break 3 days on purpose (run once after seeding)
-python pipeline.py       # run rules + anomaly model, print verdicts
+python seed.py
+python inject_fault.py        # run once after seeding
+python pipeline.py
 ```
 
 ## Demo scenario
@@ -62,19 +65,23 @@ python pipeline.py       # run rules + anomaly model, print verdicts
 
 ## Results
 
-On 30 synthetic daily batches with a score threshold of 0.03:
+### Chronological evaluation
 
-| Day | Caught by | Verdict |
-|---|---|---|
-| Sept 12 | Anomaly model | WARN |
-| Sept 18 | Rules | BLOCK |
-| Sept 23 | Rules | BLOCK |
-| Other 27 days | n/a | PASS |
+60 daily batches. The model and threshold were fit on the first 40 days (Sept 1 – Oct 10), using only days that passed the rules. It was then evaluated on the last 20 days (Oct 11 – 30), which contain three faults the rules can't catch.
 
+| Day | Fault | Score | Caught? |
+|---|---|---|---|
+| Oct 15 | 70% of rows lost | 0.186 | Yes |
+| Oct 21 | Prices 10× too high | 0.093 | Yes |
+| Oct 27 | 300 orders wrongly cancelled | 0.034 | **No** |
 
-All 3 injected faults were caught with no false alarms on clean days.
+Threshold (95th percentile of training scores): 0.047
 
-![Quality report](docs/report.png)
+- Recall: 2 of 3 faults caught
+- Precision: 2 of 2 flags were real faults
+- False alarms: 0 of 17 clean test days
+
+**Why Oct 27 was missed:** the cancelled-rate spike changes only one of six features, and its score (0.034) is indistinguishable from a clean day (Oct 24, 0.035). Also, Sept 12 (a fault that passes the rules) remained in the training data, which likely raised the threshold.
 
 ## Design decisions
 
@@ -85,7 +92,8 @@ All 3 injected faults were caught with no false alarms on clean days.
 ## Limitations
 
 - Synthetic data only.
-- The threshold was chosen by looking at the same 30 days it's evaluated on. A fair test would tune it on earlier days and evaluate on later ones.
+- - Small training window (~37 clean days). Training data may contain undetected faults (Sept 12 does), which inflates the threshold.
+- A single-feature shift (like the cancellation spike) can be missed; a dedicated rule or per-feature check would catch it.
 - `inject_fault.py` is not idempotent: running it twice without reseeding damages data twice.
 
 ## Testing

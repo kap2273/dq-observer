@@ -24,8 +24,8 @@ out.mkdir(parents=True, exist_ok=True)
 start = pd.Timestamp("2026-09-01")   # the first day of fake data
 order_id = 1                         # the first order number
 
-# --- Repeat once per day, 30 times (day = 0, 1, 2, ... 29) ---
-for day in range(30):
+# --- Repeat once per day, 60 times (day = 0, 1, 2, ... 59) ---
+for day in range(60):
 
     # Today's date = Sept 1 + however many days we've done
     date = start + pd.Timedelta(days=day)
@@ -62,5 +62,5 @@ for day in range(30):
     # index=False = don't add an extra row-number column
     df.to_csv(out / f"orders_{date.date()}.csv", index=False)
 
-# --- Runs once, after all 30 days are done ---
-print("Made 30 batches in", out)
+# --- Runs once, after all 60 days are done ---
+print("Made 60 batches in", out)
