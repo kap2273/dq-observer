@@ -11,6 +11,7 @@ psycopg-binary==3.3.6
 Pygments==2.21.0
 pytest==9.1.1
 python-dateutil==2.9.0.post0
+python-dotenv==1.2.4
 scikit-learn==1.9.1
 scipy==1.18.1
 six==1.17.0

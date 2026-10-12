@@ -25,8 +25,10 @@ Each daily batch gets one verdict:
 ```
 
 **Rules** check things that should never happen: duplicate order IDs, blank customer IDs, negative amounts, unknown status values.
+results from every run are stored in a PostgreSQL table batch_results, with a timestamp per run.
 
 **The anomaly model** (scikit-learn Isolation Forest) learns what a normal day looks like from 30 days of batch metrics (row count, null rate, duplicate rate, average and max amount, cancellation rate) and scores how unusual each day is.
+
 
 ### Why both?
 
@@ -85,7 +87,6 @@ All 3 injected faults were caught with no false alarms on clean days.
 - Synthetic data only.
 - The threshold was chosen by looking at the same 30 days it's evaluated on. A fair test would tune it on earlier days and evaluate on later ones.
 - `inject_fault.py` is not idempotent: running it twice without reseeding damages data twice.
-- Results are printed, not stored.
 
 ## Testing
 
@@ -111,7 +112,6 @@ pytest
 
 ## Next steps
 
-- Store results in PostgreSQL
 - HTML report of verdicts and score trends
 - Chronological evaluation for threshold tuning
 - Scheduling with Airflow in Docker
